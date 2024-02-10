@@ -18,41 +18,56 @@
 #include "lwip/apps/mqtt_priv.h"
 
 #include "tusb.h"
-
+#include "FreeRTOS.h"
+#include <task.h>
 #include "board_definitions.hpp"
 
-
-void error_handler() {
+void error_handler()
+{
     cyw43_arch_disable_sta_mode();
     cyw43_arch_deinit();
-    while (1) { ;
+    while (1)
+    {
+        ;
     }
 }
 
+void led_task(void *pvArg)
+{
+    while (true)
+    {
+        cyw43_arch_gpio_put(CYW43_WL_GPIO_LED_PIN, 1);
+        vTaskDelay(250/portTICK_PERIOD_MS);
+        cyw43_arch_gpio_put(CYW43_WL_GPIO_LED_PIN, 0);
+        vTaskDelay(250/portTICK_PERIOD_MS);
+    }
+}
 
-
-int main() {
+int main()
+{
     stdio_init_all();
-    //printf("waiting for usb host");
-    //while (!tud_cdc_connected()) {
-    //    printf(".");
-    //    sleep_ms(500);
-   // }
-    if (cyw43_arch_init()) {
-     //   printf("failed to initialise\n");
+
+    // printf("waiting for usb host");
+    // while (!tud_cdc_connected()) {
+    //     printf(".");
+    //     sleep_ms(500);
+    // }
+    if (cyw43_arch_init())
+    {
+        //   printf("failed to initialise\n");
         return 1;
     }
-    //cyw43_arch_enable_sta_mode();
-   // printf("Connecting to WiFi...\n");
-    //do {
+    xTaskCreate(led_task, "Led blinky", 128, NULL, 1, NULL);
+
+    // cyw43_arch_enable_sta_mode();
+    // printf("Connecting to WiFi...\n");
+    // do {
     //    printf(".");
     //} while (cyw43_arch_wifi_connect_timeout_ms(WIFI_SSID, WIFI_PASSWORD, CYW43_AUTH_WPA2_AES_PSK, 3000));
 
-    while (true) {
-        cyw43_arch_gpio_put(CYW43_WL_GPIO_LED_PIN, 1);
-        sleep_ms(250);
-        cyw43_arch_gpio_put(CYW43_WL_GPIO_LED_PIN, 0);
-        sleep_ms(250);
+    vTaskStartScheduler();
+    while (true)
+    {
     }
     cyw43_arch_deinit();
 

@@ -3,8 +3,17 @@ set(PICO_BOARD pico_w)
 set(PICO_SDK_FETCH_FROM_GIT ON)
 # Pull in SDK (must be before project)
 include(pico_sdk_import.cmake)
+include(FetchContent)
+
+FetchContent_Declare(
+  FreeRTOS
+  GIT_REPOSITORY https://github.com/FreeRTOS/FreeRTOS-Kernel
+  GIT_TAG        V11.0.1
+  SOURCE_DIR ${CMAKE_CURRENT_LIST_DIR}/lib/FreeRTOS
+)
 
 project(MIC5_Final_assignment C CXX ASM)
+
 set(CMAKE_C_STANDARD 11)
 set(CMAKE_CXX_STANDARD 17)
 
@@ -34,11 +43,21 @@ if (PICO_CYW43_SUPPORTED) # set by BOARD=pico-w
         target_include_directories(led_matrix PUBLIC
                 ${CMAKE_CURRENT_LIST_DIR}/src
         )
-        
+
+        # Select the heap port.  values between 1-4 will pick a heap.
+        #set(FREERTOS_HEAP "4" CACHE STRING "" FORCE)
+
+        # Select the native compile PORT
+        set(FREERTOS_PORT "GCC_ARM_CM0" CACHE STRING "" FORCE)
+        add_library(freertos_config INTERFACE)
+        FetchContent_MakeAvailable(FreeRTOS)
+        target_include_directories(freertos_config INTERFACE "config/")
         target_link_libraries(led_matrix  pico_cyw43_arch_lwip_poll
         pico_stdlib
         pico_lwip_mbedtls
-        pico_mbedtls)
+        pico_mbedtls
+        freertos_kernel
+        freertos_config)
 
         pico_add_extra_outputs(led_matrix)
 
