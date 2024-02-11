@@ -35,17 +35,18 @@ if (PICO_CYW43_SUPPORTED) # set by BOARD=pico-w
     if (NOT TARGET pico_cyw43_arch)
         message("Skipping build as support is not available")
     else ()
-        add_executable(led_matrix src/main.c)
+        add_executable(led_matrix "src/main.c" "src/matrix_driver_lib/matrix_driver.c")
         # enable usb output, disable uart output
         pico_enable_stdio_usb(led_matrix 1)
         pico_enable_stdio_uart(led_matrix 0)
 
         target_include_directories(led_matrix PUBLIC
                 ${CMAKE_CURRENT_LIST_DIR}/src
+                ${CMAKE_CURRENT_LIST_DIR}/src/matrix_driver_lib
         )
 
         # Select the heap port.  values between 1-4 will pick a heap.
-        #set(FREERTOS_HEAP "4" CACHE STRING "" FORCE)
+        set(FREERTOS_HEAP "4" CACHE STRING "" FORCE)
 
         # Select the native compile PORT
         set(FREERTOS_PORT "GCC_ARM_CM0" CACHE STRING "" FORCE)

@@ -32,11 +32,20 @@
 #define xPortPendSVHandler      isr_pendsv
 #define xPortSysTickHandler     isr_systick
 
+
+/* Heap and stack.
+ * The bytes specified in configTOTAL_HEAP_SIZE need to fit in to
+ * the first memory bank, which is of size 16kB in total. This 16kB
+ * consists of FreeRTOS heap, linker heap and also .bss etc. Thus
+ * FreeRTOS heap cannot take the entire 16kB.
+ */
+#define configTOTAL_HEAP_SIZE			         (  ( size_t ) ( 8 * 1024 ) )
+
 #define configUSE_PREEMPTION                    1           // Allow tasks to be pre-empted
 #define configUSE_TIME_SLICING                  1           // Allow FreeRTOS to switch tasks at each tick
 #define configUSE_PORT_OPTIMISED_TASK_SELECTION 0
 #define configUSE_TICKLESS_IDLE                 0
-#define configCPU_CLOCK_HZ                      133000000   // 133MHz for RP2040
+#define configCPU_CLOCK_HZ                      125000000   // 125MHz for RP2040
 #define configTICK_RATE_HZ                      1000        // FreeRTOS beats per second
 #define configMAX_PRIORITIES                    5           // Max number of priority values (0-24)
 #define configMINIMAL_STACK_SIZE                128
@@ -62,12 +71,13 @@
 /* Memory allocation related definitions. */
 #define configSUPPORT_STATIC_ALLOCATION         0
 #define configSUPPORT_DYNAMIC_ALLOCATION        1           // Get FreeRTOS to allocation task memory
-#define configAPPLICATION_ALLOCATED_HEAP        1
+#define configAPPLICATION_ALLOCATED_HEAP        0
 
 /* Hook function related definitions. */
 #define configUSE_IDLE_HOOK                     0
 #define configUSE_TICK_HOOK                     0
 #define configCHECK_FOR_STACK_OVERFLOW          0
+#define configCHECK_HANDLER_INSTALLATION        0
 #define configUSE_MALLOC_FAILED_HOOK            0
 #define configUSE_DAEMON_TASK_STARTUP_HOOK      0
 
