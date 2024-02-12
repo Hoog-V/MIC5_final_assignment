@@ -58,7 +58,8 @@ if (PICO_CYW43_SUPPORTED) # set by BOARD=pico-w
         pico_lwip_mbedtls
         pico_mbedtls
         freertos_kernel
-        freertos_config)
+        freertos_config
+        hardware_pwm)
 
         pico_add_extra_outputs(led_matrix)
 

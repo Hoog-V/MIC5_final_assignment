@@ -7,6 +7,6 @@ typedef struct {
 uint32_t data[64];
 }frame_line_t;
 
-void matrix_init(QueueHandle_t frame_queue);
+void matrix_init();
 
 #endif /* MATRIX_DRIVER_H */

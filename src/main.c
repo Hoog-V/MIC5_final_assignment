@@ -35,18 +35,8 @@ void error_handler()
 
 void led_task(void *arg)
 {
-    QueueHandle_t frame_queue = (QueueHandle_t) arg;
-    frame_line_t frame;
-    int status;
-    for(uint8_t i = 0; i<64; i++) {
-        frame.data[i] = (i % 2) ? 0 : 0x06;
-    }
     while (true)
     {
-        status = xQueueSend(frame_queue, &frame, 0);
-        if(status != pdPASS) {
-            printf("Can not send message!\n");
-        }
         cyw43_arch_gpio_put(CYW43_WL_GPIO_LED_PIN, 1);
         vTaskDelay(250/portTICK_PERIOD_MS);
         cyw43_arch_gpio_put(CYW43_WL_GPIO_LED_PIN, 0);
@@ -85,17 +75,13 @@ int main()
         //   printf("failed to initialise\n");
         return 1;
     }
-    QueueHandle_t frame_queue = xQueueCreate(5, sizeof(frame_line_t));
-    if(frame_queue == NULL) {
-        while(1);
-    }
-    int status = xTaskCreate(led_task, "Led blinky", 512, frame_queue, 1, NULL);
+    int status = xTaskCreate(led_task, "Led blinky", 512, NULL, 1, NULL);
     if(status != pdPASS) {
         while(1);
     }
 
 
-    matrix_init(frame_queue);
+    matrix_init();
     // status = xTaskCreate(matrix_frame_feeder, "frame feeder", 512, frame_queue, 3, NULL);
     // if(status != pdPASS) {
     //     while(1);
